@@ -10,8 +10,7 @@ from torchvision.datasets import MNIST
 from torchvision.transforms import Compose,ToTensor,Normalize
 
 TRAIN_BATCH_SIZE = 128
-TEST_BAICH_SIZE = 128*128
-os.chroot = '~/WorkPlace/Python/VScode_Hello/0511'
+TEST_BAICH_SIZE = 1000
 
 #准备数据
 def get_dataloader(batch_size =TRAIN_BATCH_SIZE,train = True):
