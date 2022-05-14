@@ -25,7 +25,7 @@ def get_dataloader(batch_size =TRAIN_BATCH_SIZE,train = True):
 
 #定义网络
 class Network(nn.Module):
-    def __init__(self) -> None:
+    def __init__(self):
         super(Network,self).__init__()
         self.fc1 = nn.Linear(28*28,28)
         self.fc2 = nn.Linear(28,10)
@@ -39,8 +39,7 @@ class Network(nn.Module):
         output = self.fc1(input)
         output = F.relu(output)
         output = self.fc2(output)
-        output = F.log_softmax(output,-1)
-        return output
+        return F.log_softmax(output,-1)
 
 #实例化网络、定义优化器和损失函数
 model = Network()
@@ -59,10 +58,10 @@ def train(echo = 1000):
             cur_loss.backward()
             optimize.step()
 
-            if id % 100 == 0:
+            if id % 10 == 0:
                 print(i,':',cur_loss.item())
                 loss.append(cur_loss.item())
-    x = [i for i in range(loss.size())]
+    x = [i for i in range(len(loss))]
     plt.plot(x,loss)
     plt.show()
                 
