@@ -11,6 +11,7 @@ from torchvision.transforms import Compose, ToTensor, Normalize
 
 TRAIN_BATCH_SIZE = 128
 TEST_BATCH_SIZE = 1000
+device = torch.device('cuda')
 
 
 # 准备数据
@@ -45,7 +46,7 @@ class Network(nn.Module):
 
 
 # 实例化网络、定义优化器和损失函数
-model = Network()
+model = Network().to(device)
 optimize = Adam(model.parameters(), 0.001)
 loss_fn = F.nll_loss
 
@@ -57,10 +58,10 @@ if os.path.exists('./model/model.pkl'):
 # 训练
 def train(echo):
     loss = []
-    acc = []
     for i in range(echo):
         train_data_loader = get_dataloader(TRAIN_BATCH_SIZE)
         for id, (input, target) in enumerate(train_data_loader):
+            input, target = input.to(device), target.to(device)
             optimize.zero_grad()
             output = model(input)
             cur_loss = loss_fn(output, target)
@@ -70,17 +71,15 @@ def train(echo):
             if id % 10 == 0:
                 print('echo:', i, 'id:', id, 'loss:', cur_loss.item())
                 loss.append(cur_loss.item())
-                acc.append(test())
+                # acc.append(test())
 
             if id % 100 == 0:
                 torch.save(model.state_dict(), './model/model.pkl')
                 torch.save(optimize.state_dict(), './model/optim.pkl')
 
-    loss_x = [i for i in range(len(loss))]
-    acc_x = np.linspace(0, len(loss), len(acc))
+    loss_x = range(len(loss))
     plt.title('loss and acc')
     plt.plot(loss_x, loss, label='loss')
-    plt.plot(acc_x, acc, 10, label='acc', color='y')
     plt.ylim(0, 3)
     plt.legend()
     plt.savefig('lossANDacc.svg')
@@ -92,6 +91,7 @@ def test():
     acc = []
     test_data_loader = get_dataloader(TEST_BATCH_SIZE, False)
     for id, (input, target) in enumerate(test_data_loader):
+        input, target = input.to(device), target.to(device)
         with torch.no_grad():
             output = model(input)
             # loss:
@@ -106,4 +106,5 @@ def test():
 
 
 if __name__ == '__main__':
-    train(3)
+    train(2)
+    test()
